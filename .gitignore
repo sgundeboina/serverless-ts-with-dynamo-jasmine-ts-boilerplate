@@ -1,0 +1,29 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+.build
+.vscode
+.webpack
+_warmup/
+dist
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# test/coverage output
+.nyc_output
+reports
+
+jmeter.log
+loadtest-results*
+apache-jmeter*
+*.map
+.dynamodb
+
+loadtest-results-*
+smoke-test-results-*
+smoketesting-results

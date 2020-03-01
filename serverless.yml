@@ -1,0 +1,69 @@
+
+service: dynamodb-design-experiments
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  - serverless-plugin-typescript  
+
+provider:
+  name: aws
+  runtime: nodejs12.x  
+  environment: 
+    DYNAMODB_TABLE: 'MY_DEMO_TABLE'
+
+custom:
+  dynamodb:
+    stages:
+      -dev
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    
+functions:
+  hello:
+    handler: src/handler.hello
+    events:
+      - http:
+          path: hello/
+          method: get
+          cors: true
+    
+resources:
+  Resources:
+    ProfilesDynamoDbTableV1:
+      $global: true
+      Type: 'AWS::DynamoDB::Table'
+      # DeletionPolicy: Retain
+      Properties:
+        BillingMode : PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+          - AttributeName: gsi1_pk
+            AttributeType: S
+          - AttributeName: gsi1_sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        SSESpecification:
+          SSEEnabled: true
+        GlobalSecondaryIndexes:
+          - IndexName: gsi1
+            KeySchema:
+              - AttributeName: gsi1_pk
+                KeyType: HASH
+              - AttributeName: gsi1_sk
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+   

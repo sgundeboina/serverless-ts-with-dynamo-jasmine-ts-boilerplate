@@ -1,0 +1,31 @@
+{
+  "name": "dynamodb-design-experiments",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "lint": "npx tslint src/**/*.ts test/**/*.ts",
+    "runlocal": "sls dynamodb install && sls offline start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.630.0",
+    "reflect-metadata": "^0.1.13",
+    "tslib": "^1.11.1",
+    "tsyringe": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.26",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/node": "^10.12.18",
+    "cross-env": "^7.0.0",
+    "serverless": "^1.65.0",
+    "serverless-dynamodb-local": "^0.2.37",
+    "serverless-offline": "^5.12.1",
+    "serverless-plugin-typescript": "^1.1.9",
+    "ts-node": "^8.6.2",
+    "tslint": "^5.14.0",
+    "typescript": "^3.8.3"
+  }
+}
