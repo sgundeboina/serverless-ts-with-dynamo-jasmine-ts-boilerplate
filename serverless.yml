@@ -1,26 +1,24 @@
-
 service: dynamodb-design-experiments
 
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
-  - serverless-plugin-typescript  
+  - serverless-plugin-typescript
 
 provider:
   name: aws
-  runtime: nodejs12.x  
-  environment: 
-    DYNAMODB_TABLE: 'MY_DEMO_TABLE'
+  runtime: nodejs12.x
+  environment:
+    DYNAMODB_TABLE: "PropertiesTableGSI"
 
 custom:
   dynamodb:
-    stages:
-      -dev
+    stages: -dev
     start:
       port: 8000
       inMemory: true
       migrate: true
-    
+
 functions:
   hello:
     handler: src/handler.hello
@@ -29,41 +27,62 @@ functions:
           path: hello/
           method: get
           cors: true
-    
+
 resources:
   Resources:
-    ProfilesDynamoDbTableV1:
+    PropertiesDynamoDbTableWithRelations:
       $global: true
-      Type: 'AWS::DynamoDB::Table'
-      # DeletionPolicy: Retain
+      Type: "AWS::DynamoDB::Table"
       Properties:
-        BillingMode : PAY_PER_REQUEST
+        BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: pk
+          - AttributeName: propertyId
             AttributeType: S
-          - AttributeName: sk
+          - AttributeName: sortKey
             AttributeType: S
-          - AttributeName: gsi1_pk
+          - AttributeName: country_city
             AttributeType: S
-          - AttributeName: gsi1_sk
+          - AttributeName: ownerId
+            AttributeType: S
+          - AttributeName: startBookingDate
+            AttributeType: S
+          - AttributeName: userId
             AttributeType: S
         KeySchema:
-          - AttributeName: pk
+          - AttributeName: propertyId
             KeyType: HASH
-          - AttributeName: sk
+          - AttributeName: sortKey
             KeyType: RANGE
         SSESpecification:
           SSEEnabled: true
         GlobalSecondaryIndexes:
-          - IndexName: gsi1
+          - IndexName: Properties_GSI1
             KeySchema:
-              - AttributeName: gsi1_pk
+              - AttributeName: country_city
                 KeyType: HASH
-              - AttributeName: gsi1_sk
+              - AttributeName: propertyId
                 KeyType: RANGE
             Projection:
-              ProjectionType: ALL
+              NonKeyAttributes: [ownerId, title, description, city, country]
+              ProjectionType: INCLUDE
+          - IndexName: Properties_GSI2
+            KeySchema:
+              - AttributeName: ownerId
+                KeyType: HASH
+              - AttributeName: propertyId
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes: [title, description, city, country]
+              ProjectionType: INCLUDE
+          - IndexName: Properties_GSI3
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: startBookingDate
+                KeyType: RANGE
+            Projection:
+              NonKeyAttributes: [propertyId, endBookingDate]
+              ProjectionType: INCLUDE
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
-   
